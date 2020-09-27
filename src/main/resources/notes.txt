@@ -1,0 +1,59 @@
+public static void main(String[] args) {
+        Group group = new Group();
+
+        Category c1 = new Category();
+        Category c2 = new Category();
+        Category c3 = new Category();
+        Category c4 = new Category();
+        //----------------------------------------
+
+        group.getCategories().add(c1);
+        group.getCategories().add(c2);
+        group.getCategories().add(c3);
+        group.getCategories().add(c4);
+
+        //entityManager.save(group);
+        //mappedBy, no cascade, no @Transactional - save only group, if @Transactional or CASCADE.ALL saved group and category without relation ;
+//----------------------------------------
+
+        //entityManager.save(c1);
+        //entityManager.save(c2);
+        //entityManager.save(c3);
+
+        group.getCategories().add(c1);
+        group.getCategories().add(c2);
+        group.getCategories().add(c3);
+        group.getCategories().add(c4);
+
+        //entityManager.save(group); - group saved, categories saved, no relation;
+
+//----------------------------------------
+
+        //entityManager.save(group);
+
+        c1.setGroup(group);
+        c2.setGroup(group);
+        c3.setGroup(group);
+
+        //entityManager.save(c1);
+        //entityManager.save(c2);
+        //entityManager.save(c3);
+      // relation between category and group
+  //category is responsible
+    }
+
+
+
+https://www.sulpak.kz/filteredgoods/smartfoniy/almaty/~/~/~/NoveltyDesc/default/~/1/31
+
+/~/~/~/NoveltyDesc/default/~/1/31
+
+
+https://www.sulpak.kz/filteredgoods/akkumulyatoriy_k_telefonam/~/~/NoveltyDesc/default/~/1/31
+https://www.sulpak.kz/f/akkumulyatoriy_k_telefonam/~/~/NoveltyDesc/default/~/1/31
+
+replace
+www.sulpak.kz/f/
+with
+www.sulpak.kz/filteredgoods/
+
