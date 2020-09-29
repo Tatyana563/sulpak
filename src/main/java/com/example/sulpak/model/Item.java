@@ -10,11 +10,22 @@ public class Item {
     private Integer id;
 
     private String model;
-    private Double price;
+    private String price;
     private String code;
     private Boolean available;
     private String image;
     private String url;
+
+    public Item(String model, String price, String code, String image, String url) {
+        this.model = model;
+        this.price = price;
+        this.code = code;
+        this.image = image;
+        this.url = url;
+    }
+
+    public Item() {
+    }
 
     public String getModel() {
         return model;
@@ -41,11 +52,11 @@ public class Item {
         this.id = id;
     }
 
-    public Double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 
