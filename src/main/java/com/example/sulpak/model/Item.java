@@ -10,13 +10,13 @@ public class Item {
     private Integer id;
 
     private String model;
-    private String price;
-    private String code;
+    private Double price;
+    private Integer code;
     private Boolean available;
     private String image;
     private String url;
 
-    public Item(String model, String price, String code, String image, String url) {
+    public Item(String model, Double price, Integer code, String image, String url) {
         this.model = model;
         this.price = price;
         this.code = code;
@@ -24,24 +24,11 @@ public class Item {
         this.url = url;
     }
 
-    public Item() {
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
+    public Item(Integer code) {
         this.code = code;
+    }
+
+    public Item() {
     }
 
     public Integer getId() {
@@ -52,12 +39,28 @@ public class Item {
         this.id = id;
     }
 
-    public String getPrice() {
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
     public Boolean getAvailable() {
@@ -68,14 +71,6 @@ public class Item {
         this.available = available;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public String getImage() {
         return image;
     }
@@ -84,4 +79,11 @@ public class Item {
         this.image = image;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

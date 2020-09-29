@@ -14,6 +14,6 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     boolean existsByUrl(String url);
-    @Query("from Category as c where c.postProcessed = false ORDER BY c.id ASC  ")
+    @Query("from Category as c ORDER BY c.id ASC")
     List<Category> getChunk(PageRequest pageable);
 }

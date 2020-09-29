@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 
-
 public class ItemsUpdateTask implements Runnable {
     private static final String URL = "https://www.sulpak.kz";
     private static final Logger LOG = LoggerFactory.getLogger(ItemsUpdateTask.class);
@@ -24,7 +23,9 @@ public class ItemsUpdateTask implements Runnable {
     private final Category category;
     private final CountDownLatch latch;
 
-    private static final String PAGE_PARAM_FORMAT = "https://www.sulpak.kz/filteredgoods/akkumulyatoriy_k_telefonam/~/~/NoveltyDesc/default/~/1/%d";
+    private static final String CATEGORY_URL_REPLACEMENT = "https://www.sulpak.kz/f/";
+    private static final String PAGE_URL_START = "https://www.sulpak.kz/filteredgoods/";
+    private static final String PAGE_URL_NUMBER_FORMAT = "/~/~/NoveltyDesc/default/~/%d/31";
 
     public ItemsUpdateTask(ItemRepository itemRepository, Category category, CountDownLatch latch) {
         this.itemRepository = itemRepository;
@@ -34,44 +35,59 @@ public class ItemsUpdateTask implements Runnable {
 
     @Override
     public void run() {
-        String categoryUrl = category.getUrl();
-        String filterURL = categoryUrl.replace(" www.sulpak.kz/f/"," www.sulpak.kz/filteredgoods/");
-        Document itemsPage = null;
         try {
+            String categoryUrl = category.getUrl();
+            String pageUrlFormat = categoryUrl.replace(CATEGORY_URL_REPLACEMENT, PAGE_URL_START) + PAGE_URL_NUMBER_FORMAT;
+            String firstPageUrl = String.format(pageUrlFormat, 1);
 
-            for (int i = 0; i < numberOfPages; i++) {
+            Document firstPage = Jsoup.connect(firstPageUrl).get();
+            int totalPages = getTotalPages(firstPage);
+            parseItems(firstPage);
+            for (int i = 2; i <= totalPages; i++) {
                 LOG.info("Получаем список товаров - страница {}", i);
-                Document newsPage = Jsoup.connect(String.format(PAGE_PARAM_FORMAT, i)).get();
-
+                parseItems(Jsoup.connect(String.format(pageUrlFormat, i)).get());
             }
 
-            itemsPage = Jsoup.connect(filterURL).get();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        Elements itemElements = itemsPage.select(".goods-tiles");
-        try {
-            for (Element itemElement : itemElements) {
-                String itemText = itemElement.select("a").text();
-                String itemLink = URL + itemElement.select("a").attr("href");
-                String itemPrice = (itemElement.select(".price").text());
-                String itemAvailability = itemElement.select(".availability").text();
-                String itemCode = itemElement.select(".code").text();
-                String itemPhoto = itemElement.select(".goods-photo img").attr("src");
-                Item item = new Item(itemText, itemPrice, itemCode, itemPhoto, itemLink);
-                category.setPostProcessed(true);
-                if (StringUtils.containsIgnoreCase(itemAvailability, "есть в наличии")
-                        ||StringUtils.containsIgnoreCase(itemAvailability, "товар на витрине")) {
-                    item.setAvailable(true);
-                } else {
-                    item.setAvailable(false);
-                }
-                if (!itemRepository.existsByCode(itemCode)) {
-                    itemRepository.save(item);
-                }
-            }
         } finally {
             latch.countDown();
+        }
+    }
+
+    private int getTotalPages(Document firstPage) {
+        Elements lastPage = firstPage.select(".pagination .pages-list a");
+        if (!lastPage.isEmpty()) {
+            return Integer.parseInt(lastPage.last().text());
+        }
+        return 0;
+    }
+
+    private void parseItems(Document page) {
+
+        Elements itemElements = page.select(".goods-container .tile-container");
+        for (Element itemElement : itemElements) {
+            Double itemPrice = Double.valueOf(itemElement.attr("data-price"));
+            Element a = itemElement.selectFirst("a.title");
+            String itemText = a.text();
+            String itemLink = a.absUrl("href");
+
+            LOG.info("Нашли товар {}/{}", itemText, itemPrice);
+
+            String itemAvailability = itemElement.selectFirst("span.availability").text();
+            Integer itemCode = Integer.valueOf(itemElement.attr("data-code"));
+            String itemPhoto = itemElement.selectFirst(".goods-photo img").absUrl("src");
+
+            Item item = itemRepository.findOneByCode(itemCode).orElseGet(() -> new Item(itemCode));
+            item.setModel(itemText);
+            item.setPrice(itemPrice);
+            item.setImage(itemPhoto);
+            item.setUrl(itemLink);
+
+            item.setAvailable(StringUtils.containsIgnoreCase(itemAvailability, "есть в наличии")
+                    || StringUtils.containsIgnoreCase(itemAvailability, "товар на витрине"));
+
+            itemRepository.save(item);
         }
     }
 }

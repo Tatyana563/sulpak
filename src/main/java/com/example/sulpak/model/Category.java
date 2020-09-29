@@ -11,17 +11,15 @@ public class Category {
 
     private String name;
     private String url;
-    private Boolean postProcessed;
     @ManyToOne
     private MainGroup group;
 
     public Category() {
     }
 
-    public Category(String name, String url, Boolean postProcessed, MainGroup group) {
+    public Category(String name, String url, MainGroup group) {
         this.name = name;
         this.url = url;
-        this.postProcessed = postProcessed;
         this.group = group;
     }
 
@@ -55,14 +53,6 @@ public class Category {
 
     public void setGroup(MainGroup group) {
         this.group = group;
-    }
-
-    public Boolean getPostProcessed() {
-        return postProcessed;
-    }
-
-    public void setPostProcessed(Boolean postProcessed) {
-        this.postProcessed = postProcessed;
     }
 
     @Override
