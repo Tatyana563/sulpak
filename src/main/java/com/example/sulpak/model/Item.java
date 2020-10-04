@@ -8,20 +8,27 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @Column(columnDefinition = "text")
     private String model;
     private Double price;
     private Integer code;
     private Boolean available;
     private String image;
     private String url;
+    @Column(columnDefinition = "text")
+    private String description;
 
-    public Item(String model, Double price, Integer code, String image, String url) {
+    @ManyToOne
+    private Category category;
+
+    public Item(String model, Double price, Integer code, Boolean available, String image, String url, String description) {
         this.model = model;
         this.price = price;
         this.code = code;
+        this.available = available;
         this.image = image;
         this.url = url;
+        this.description = description;
     }
 
     public Item(Integer code) {
@@ -85,5 +92,21 @@ public class Item {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

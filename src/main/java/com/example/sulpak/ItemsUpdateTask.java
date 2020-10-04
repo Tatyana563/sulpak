@@ -87,6 +87,7 @@ public class ItemsUpdateTask implements Runnable {
             item.setAvailable(StringUtils.containsIgnoreCase(itemAvailability, "есть в наличии")
                     || StringUtils.containsIgnoreCase(itemAvailability, "товар на витрине"));
 
+            item.setCategory(category);
             itemRepository.save(item);
         }
     }
