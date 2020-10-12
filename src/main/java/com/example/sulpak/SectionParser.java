@@ -79,7 +79,7 @@ public class SectionParser {
                 String sectionUrl = sectionElement.absUrl("href");
                 Section section = sectionRepository.findOneByUrl(sectionUrl)
                         .orElseGet(() -> sectionRepository.save(new Section(text, sectionUrl)));
-                Document groupPage = Jsoup.connect(sectionUrl).get();//телефоны и гаджеты
+                Document groupPage = Jsoup.connect(sectionUrl).get();
                 LOG.info("Получили {}, ищем группы...", text);
                 Elements groupElements = groupPage.select(".portal-menu-title a");
                 for (Element groupElement : groupElements) {
@@ -89,9 +89,9 @@ public class SectionParser {
                     if (!GROUPS_EXCEPTIONS.contains(groupText)) {
                         MainGroup group = mainGroupRepository.findOneByUrl(sectionUrl)
                                 .orElseGet(() -> mainGroupRepository.save(new MainGroup(groupText, groupUrl, section)));
-                        Elements categoryElements = groupElement
-                                .closest(".portal-menu-block.category-block")
-                                .select(".portal-menu-items a");
+                        Document categoryPage = Jsoup.connect(groupUrl).get();
+                       // Elements categoryElements = groupElement.select(".portal-menu-items a");
+                        Elements categoryElements = categoryPage.select(".portal-parts-list a");
                         for (Element categoryElement : categoryElements) {
                             String categoryLink = categoryElement.absUrl("href");
                             String categoryText = categoryElement.text();
@@ -99,8 +99,6 @@ public class SectionParser {
                             if (!categoryRepository.existsByUrl(sectionUrl)) {
                                 categoryRepository.save(new Category(categoryText, categoryLink, group));
                             }
-                            Instant end = Instant.now();
-                            System.out.println("PROCEESS OF GETTING CATEGORIES FINISHED FOR: "+Duration.between(start, end));
                         }
                     }
                 }
@@ -130,13 +128,5 @@ public class SectionParser {
             LOG.info("Задачи выполнены, следующая порция...");
         }
         executorService.shutdown();
-    }
-
-
-    public void updateSingleItems() {
-        // 1. получить список/порцию товаров
-        // 2.
-
-
     }
 }
